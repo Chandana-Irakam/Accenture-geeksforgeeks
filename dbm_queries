@@ -1,0 +1,34 @@
+# db/models.py
+
+from sqlalchemy import create_engine, Column, Integer, String, Float, JSON, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+
+Base = declarative_base()
+
+class Farm(Base):
+    __tablename__ = 'farms'
+    
+    id = Column(Integer, primary_key=True)
+    farmer_id = Column(Integer)
+    location = Column(String)  # Stored as "lat,lon"
+    soil_data = Column(JSON)  # Dictionary of soil properties
+    water_budget = Column(Float)  # mm/m2/year
+    crop_history = Column(JSON)  # List of previous crops
+    last_updated = Column(DateTime, default=datetime.utcnow)
+    
+class Recommendation(Base):
+    __tablename__ = 'recommendations'
+    
+    id = Column(Integer, primary_key=True)
+    farmer_id = Column(Integer)
+    generated_at = Column(DateTime, default=datetime.utcnow)
+    crop_recommendations = Column(JSON)
+    irrigation_plan = Column(JSON)
+    soil_health = Column(JSON)
+
+def init_db():
+    engine = create_engine('sqlite:///agrisync.db')
+    Base.metadata.create_all(engine)
+    return engine
